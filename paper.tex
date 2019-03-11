@@ -1,0 +1,50 @@
+\documentclass[11pt, titlepage]{article}
+\usepackage{amssymb,amsmath,latexsym}
+%\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+% Page length commands go here in the preamble
+\setlength{\oddsidemargin}{-0.25in} % Left margin of 1 in + 0 in = 1 in
+\setlength{\textwidth}{7in}   % Right margin of 8.5 in - 1 in - 6.5 in = 1 in
+\setlength{\topmargin}{-.75in}  % Top margin of 2 in -0.75 in = 1 in
+\setlength{\textheight}{9.2in}  % Lower margin of 11 in - 9 in - 1 in = 1 in
+\setlength{\parindent}{0in} 
+\begin{document}
+\title{\Huge{Versioned Datasets and Queries in RDF/SPARQL}}
+\author{Ignacio Cuevas\\ Aidan Hogan}
+\date{\today}
+\maketitle
+\newpage
+%\abstract{} % Do we need one?
+\section{Introduction}
+The Semantic Web~\footnote{\url{https://www.w3.org/2001/sw/wiki/Main_Page}} is an initiative of the World Wide Web Consortium, which envisions a ``Web of Data;'' that is, a web of \textit{Linked Data} where information has an standarized structure, making it easier for systems and machines to comunicate. In order to make such standarization possible, it becomes necessary to incorporate meta-data that describes the content, meaning and relationship of data in all databases.
+
+
+The Resource Description Framework~\cite{key:rdfprimer11} (RDF for short) is a standard model for data interchange on the Web. Its design is based on ``triples,'' which represent connections on a graph, where every node is a ``resource'' with ``predicates'' as the edges connecting them. Both resources and predicates are formally defined, and a collection of rules allow for inferences about the relationships in the data.
+Alongside RDF, the ontological languages RDFS~\cite{key:rdfschema11} and OWL~\cite{key:owl2primer} provide basic relation and type definitions, and SPARQL~\cite{key:sparql11} serves as RDF's query engine (similar to SQL on relational databases).
+
+
+Currently, a large number of existing datasets are based on RDF due to its extense popularity, Wikidata being one the most notorious. Wikidata~\cite{VrandecicK14} is a massive dataset, with over 42 million items~\footnote{\url{https://www.wikidata.org/wiki/Wikidata:Statistics}}, which is based on all the available data of Wikipedia and structured on RDF.
+
+
+Wikidata is in constant change, due to it being an open dataset that allows being edited by users. Furthermore, data is being added often, which makes Wikidata very dynamic in some areas. Given those circumstances, it can be said that Wikidata has many ``versions'' over time, where different data is available at different time intervals, making it possible to analyze its time component.
+
+
+Dataset versioning in RDF/SPARQL is a research topic yet to be fully explored. While there are a number of implementations, most of them rely on specialized indices or SPARQL extensions. As such, it would be relevant to study the possibility of developing a versioning system and methodology for queries using only base SPARQL.
+
+
+Such system could be used as version control for the dataset; administrators would be able to detect erroneous or malicious editions on data that doesn't normally change. On top of that, it would be possible to analyze the evolution of data, possibly predicting future changes. The system could also be used on datasets other than Wikidata, where data history may be poorly (or not at all) preserved.
+
+\section{Related Work}
+
+\section{Preliminaries} % Maybe not
+\section{(Method)} % Name of our method goes here
+\section{Evaluation} % This two sections can
+\section{Results}    % be merged for better flow
+\section{Conclusion}
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{propuesta}
+\end{document}
