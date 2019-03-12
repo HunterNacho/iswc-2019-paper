@@ -38,7 +38,10 @@ Dataset versioning in RDF/SPARQL is a research topic yet to be fully explored. W
 Such system could be used as version control for the dataset; administrators would be able to detect erroneous or malicious editions on data that doesn't normally change. On top of that, it would be possible to analyze the evolution of data, possibly predicting future changes. The system could also be used on datasets other than Wikidata, where data history may be poorly (or not at all) preserved.
 
 \section{Related Work}
+Gutierrez et al.~\cite{GutierrezHV07} describe a framework that allows time representation in RDF using annotations. An important distinction to make is that their work is focused on \textbf{labeling} over \textbf{versioning}; \textbf{labeling} means adding meta-data to query result validity, meanwhile \textbf{versioning} implies simultaneously keeping several versions of the same dataset. This work also formally defines labels and time intervals, but does not cover an implementation for either.
 
+
+Zimmerman et. al~\cite{DBLP:journals/ws/ZimmermannLPS12} extend RDF to allow generalized annotations which can, in particular, be used to add validity time intervals to each triple.
 \section{Preliminaries} % Maybe not
 \section{(Method)} % Name of our method goes here
 \section{Evaluation} % This two sections can
@@ -46,5 +49,5 @@ Such system could be used as version control for the dataset; administrators wou
 \section{Conclusion}
 \newpage
 \bibliographystyle{unsrt}
-\bibliography{propuesta}
+\bibliography{paper}
 \end{document}

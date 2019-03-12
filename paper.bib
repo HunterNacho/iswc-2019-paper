@@ -1,0 +1,302 @@
+## General references:
+
+For Wikidata:
+
+@article{VrandecicK14,
+  author    = {Denny Vrandecic and
+               Markus Kr{\"{o}}tzsch},
+  title     = {Wikidata: a free collaborative knowledgebase},
+  journal   = {Commun. {ACM}},
+  volume    = {57},
+  number    = {10},
+  pages     = {78--85},
+  year      = {2014},
+  url       = {http://doi.acm.org/10.1145/2629489},
+  doi       = {10.1145/2629489},
+  timestamp = {Wed, 14 Jun 2017 20:37:02 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/cacm/VrandecicK14},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+For DBpedia:
+
+@article{LehmannIJJKMHMK15,
+  author    = {Jens Lehmann and
+               Robert Isele and
+               Max Jakob and
+               Anja Jentzsch and
+               Dimitris Kontokostas and
+               Pablo N. Mendes and
+               Sebastian Hellmann and
+               Mohamed Morsey and
+               Patrick van Kleef and
+               S{\"{o}}ren Auer and
+               Christian Bizer},
+  title     = {DBpedia - {A} large-scale, multilingual knowledge base extracted from
+               Wikipedia},
+  journal   = {Semantic Web},
+  volume    = {6},
+  number    = {2},
+  pages     = {167--195},
+  year      = {2015},
+  url       = {https://doi.org/10.3233/SW-140134},
+  doi       = {10.3233/SW-140134},
+  timestamp = {Wed, 14 Jun 2017 20:29:13 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/semweb/LehmannIJJKMHMK15},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+For MapReduce:
+
+@article{DBLP:journals/cacm/DeanG10,
+  author    = {Jeffrey Dean and
+               Sanjay Ghemawat},
+  title     = {MapReduce: a flexible data processing tool},
+  journal   = {Commun. {ACM}},
+  volume    = {53},
+  number    = {1},
+  pages     = {72--77},
+  year      = {2010},
+  url       = {http://doi.acm.org/10.1145/1629175.1629198},
+  doi       = {10.1145/1629175.1629198},
+  timestamp = {Mon, 26 Apr 2010 14:47:08 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/cacm/DeanG10},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+For Virtuoso:
+
+@article{Erling12,
+  author    = {Orri Erling},
+  title     = {Virtuoso, a Hybrid RDBMS/Graph Column Store},
+  journal   = {{IEEE} Data Eng. Bull.},
+  volume    = {35},
+  number    = {1},
+  pages     = {3--8},
+  year      = {2012},
+  url       = {http://sites.computer.org/debull/A12mar/vicol.pdf},
+  timestamp = {Tue, 17 Apr 2012 13:08:58 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/debu/Erling12},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+For SPARQL:
+
+@misc{key:sparql11,
+    author = {Steve Harris and Andy Seaborne and Eric Prud'hommeaux},
+    title = {{SPARQL 1.1 Query Language}},
+    howpublished = {{W3C Recommendation}},
+    note = {\url{http://www.w3.org/TR/sparql11-query/}},
+    year = {2013},
+	month = mar,
+    day = {21},
+}
+
+For RDF:
+
+@misc{key:rdfprimer11,
+    author = {Guus Schreiber and Yves Raimond},
+    title = {{RDF 1.1 Primer}},
+    howpublished = {{W3C Working Group Note}},
+    note = {\url{http://www.w3.org/TR/rdf11-primer/}},
+    year = {2014},
+	month = jun,
+    day = {24},
+}
+
+For OWL:
+
+@misc{key:owl2primer,
+    author = {Pascal Hitzler and Markus Kr\"otzsch and Bijan Parsia and Peter F. Patel-Schneider and Sebastian Rudolph},
+    title = {{OWL 2 Web Ontology Language Primer}},
+    howpublished = {W3C Recommendation},
+    year = {2009},
+    month = oct,
+    day = {27},
+    note = {http://www.w3.org/TR/owl2-primer/}
+}
+
+For RDFS:
+
+@misc{key:rdfschema11,
+    author = {Dan Brickley and R.V. Guha and Brian McBride},
+    title = {{RDF Schema 1.1}},
+    howpublished = {W3C Recommendation},
+    year = {2014},
+    month = feb,
+    day = {25},
+    note = {\url{http://www.w3.org/TR/rdf-schema/}},
+}
+
+
+## RDF diffs / deltas
+
+The next two papers talk about computing diffs/delta for RDF, but with blank nodes. We simplify and do not consider the blank nodes issue.
+
+@inproceedings{TummarelloMBE07,
+  author    = {Giovanni Tummarello and
+               Christian Morbidoni and
+               Reto Bachmann{-}Gm{\"{u}}r and
+               Orri Erling},
+  title     = {RDFSync: Efficient Remote Synchronization of {RDF} Models},
+  booktitle = {International Semantic Web Conference (ISWC+ASWC)},
+  pages     = {537--551},
+  year      = {2007},
+  publisher = {Springer},
+  url       = {https://doi.org/10.1007/978-3-540-76298-0_39},
+  doi       = {10.1007/978-3-540-76298-0_39},
+  timestamp = {Fri, 02 Jun 2017 13:01:06 +0200},
+  biburl    = {http://dblp.org/rec/bib/conf/semweb/TummarelloMBE07},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@article{ZeginisTC11,
+  author    = {Dimitris Zeginis and
+               Yannis Tzitzikas and
+               Vassilis Christophides},
+  title     = {On Computing Deltas of {RDF/S} Knowledge Bases},
+  journal   = {{TWEB}},
+  volume    = {5},
+  number    = {3},
+  pages     = {14:1--14:36},
+  year      = {2011},
+  url       = {http://doi.acm.org/10.1145/1993053.1993056},
+  doi       = {10.1145/1993053.1993056},
+  timestamp = {Wed, 04 Jan 2017 10:25:27 +0100},
+  biburl    = {http://dblp.org/rec/bib/journals/tweb/ZeginisTC11},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+## Time in RDF
+
+Representing time in RDF: theoretical framework with semantics and reasoning but no implementation details.
+
+@article{GutierrezHV07,
+  author    = {Claudio Gutierrez and
+               Carlos A. Hurtado and
+               Alejandro A. Vaisman},
+  title     = {Introducing Time into {RDF}},
+  journal   = {{IEEE} Trans. Knowl. Data Eng.},
+  volume    = {19},
+  number    = {2},
+  pages     = {207--218},
+  year      = {2007},
+  url       = {https://doi.org/10.1109/TKDE.2007.34},
+  doi       = {10.1109/TKDE.2007.34},
+  timestamp = {Thu, 08 Jun 2017 09:04:17 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/tkde/GutierrezHV07},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+A general framework (including semantics and reasoning) for annotating RDF, which can include temporal annotations, but does not directly discuss efficiency nor present experiments.
+
+@article{DBLP:journals/ws/ZimmermannLPS12,
+  author    = {Antoine Zimmermann and
+               Nuno Lopes and
+               Axel Polleres and
+               Umberto Straccia},
+  title     = {A general framework for representing, reasoning and querying with
+               annotated Semantic Web data},
+  journal   = {J. Web Sem.},
+  volume    = {11},
+  pages     = {72--95},
+  year      = {2012},
+  url       = {https://doi.org/10.1016/j.websem.2011.08.006},
+  doi       = {10.1016/j.websem.2011.08.006},
+  timestamp = {Fri, 15 Sep 2017 17:21:48 +0200},
+  biburl    = {http://dblp.org/rec/bib/journals/ws/ZimmermannLPS12},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+## Time/versioning in SPARQL
+
+A query language for SPARQL with temporal operators but no implementation details:
+
+@inproceedings{Grandi10,
+  author    = {Fabio Grandi},
+  title     = {{T-SPARQL:} {A} TSQL2-like Temporal Query Language for {RDF}},
+  booktitle = {Local Proceedings of the Fourteenth East-European Conference on Advances
+               in Databases and Information Systems},
+  pages     = {21--30},
+  year      = {2010},
+  publisher = {CEUR-WS.org},
+  url       = {http://ceur-ws.org/Vol-639/021-grandi.pdf},
+  timestamp = {Mon, 30 May 2016 16:43:12 +0200},
+  biburl    = {http://dblp.org/rec/bib/conf/adbis/Grandi10},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+Most similar paper to what we want to do. An implementation of querying for RDF using SPARQL, but uses a different model (each triple is annotated with its validity). Also uses a specialised index rather than treating a query engine as a block box. (We might consider comparing with their model perhaps.)
+
+@inproceedings{TappoletB09,
+  author    = {Jonas Tappolet and
+               Abraham Bernstein},
+  title     = {Applied Temporal {RDF:} Efficient Temporal Querying of {RDF} Data with {SPARQL}},
+  booktitle = {Extended Semantic Web Conference (ESWC)},
+  pages     = {308--322},
+  year      = {2009},
+  url       = {https://doi.org/10.1007/978-3-642-02121-3_25},
+  doi       = {10.1007/978-3-642-02121-3_25},
+  timestamp = {Wed, 24 May 2017 08:29:36 +0200},
+  biburl    = {http://dblp.org/rec/bib/conf/esws/TappoletB09},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+## Maybe related ... versioning of graphs (but only supports recreating the data, not querying)
+
+@inproceedings{KhuranaD16,
+  author    = {Udayan Khurana and
+               Amol Deshpande},
+  title     = {Storing and Analyzing Historical Graph Data at Scale},
+  booktitle = {International Conference on Extending Database Technology (EDBT)},
+  pages     = {65--76},
+  year      = {2016},
+  publisher = {OpenProceedings.org},
+  url       = {https://doi.org/10.5441/002/edbt.2016.09},
+  doi       = {10.5441/002/edbt.2016.09},
+  timestamp = {Sun, 21 May 2017 00:19:14 +0200},
+  biburl    = {http://dblp.org/rec/bib/conf/edbt/KhuranaD16},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+@inproceedings{Arenas:2011:QSW:1989284.1989312,
+ author = {Arenas, Marcelo and P{\'e}rez, Jorge},
+ title = {Querying Semantic Web Data with SPARQL},
+ booktitle = {Proceedings of the Thirtieth ACM SIGMOD-SIGACT-SIGART Symposium on Principles of Database Systems},
+ series = {PODS '11},
+ year = {2011},
+ isbn = {978-1-4503-0660-7},
+ location = {Athens, Greece},
+ pages = {305--316},
+ numpages = {12},
+ url = {http://doi.acm.org.uchile.idm.oclc.org/10.1145/1989284.1989312},
+ doi = {10.1145/1989284.1989312},
+ acmid = {1989312},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {RDF, RDFS, SPARQL, linked data, semantic web},
+}
+
+
+@inproceedings{Arenas:2016:DQL:2902251.2902298,
+ author = {Arenas, Marcelo and Ugarte, Mart\'{\i}n},
+ title = {Designing a Query Language for RDF: Marrying Open and Closed Worlds},
+ booktitle = {Proceedings of the 35th ACM SIGMOD-SIGACT-SIGAI Symposium on Principles of Database Systems},
+ series = {PODS '16},
+ year = {2016},
+ isbn = {978-1-4503-4191-2},
+ location = {San Francisco, California, USA},
+ pages = {225--236},
+ numpages = {12},
+ url = {http://doi.acm.org.uchile.idm.oclc.org/10.1145/2902251.2902298},
+ doi = {10.1145/2902251.2902298},
+ acmid = {2902298},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {computational complexity, construct queries, incomplete information, query languages, semantic web},
+}
