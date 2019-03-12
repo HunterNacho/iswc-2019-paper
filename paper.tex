@@ -1,23 +1,419 @@
-\documentclass[11pt, titlepage]{article}
-\usepackage{amssymb,amsmath,latexsym}
-%\usepackage[spanish]{babel}
+\RequirePackage{amsmath}
+\documentclass{llncs}
 \usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\usepackage{hyperref}
+\PassOptionsToPackage{table}{xcolor}
+\pagestyle{headings}  % This option shows page numbers, it have to be removed in the final document.
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{scalerel}
+\usepackage{comment}
+\usepackage{framed}
+\usepackage{listings}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\usepackage{balance}
+\usepackage{stmaryrd}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{inconsolata}
+\usepackage{etoolbox}
 
-% Page length commands go here in the preamble
-\setlength{\oddsidemargin}{-0.25in} % Left margin of 1 in + 0 in = 1 in
-\setlength{\textwidth}{7in}   % Right margin of 8.5 in - 1 in - 6.5 in = 1 in
-\setlength{\topmargin}{-.75in}  % Top margin of 2 in -0.75 in = 1 in
-\setlength{\textheight}{9.2in}  % Lower margin of 11 in - 9 in - 1 in = 1 in
-\setlength{\parindent}{0in} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Quickly switch from conference to extended version
+\providetoggle{conf}
+\settoggle{conf}{false}
+
+% text only to appear in extended version
+\newcommand{\ever}[1]{\iftoggle{conf}{}{#1}}
+
+% text only to appear in the conference version
+\newcommand{\cver}[1]{\iftoggle{conf}{#1}{}}
+
+% alternate text for both versions
+\newcommand{\cever}[2]{\iftoggle{conf}{#1}{#2}}
+
+% environment for long extended-only text
+\iftoggle{conf}%
+ {\excludecomment{exver}}%
+ {\newenvironment{exver}}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+\usepackage{floatrow}
+% Table float box with bottom caption, box width adjusted to content
+\newfloatcommand{capbtabbox}{table}[][\FBwidth]
+
+\newcommand{\ah}[1]{{\color{blue}\textsc{ah:} #1}}
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+	{1ex \@plus1ex \@minus.2ex}%
+	{-1em}%
+	{\normalfont\normalsize\itshape}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SPARQL Listing style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{120,20,40}
+\definecolor{keyw}{RGB}{0,0,192}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{sparql}{
+	sensitive=false,
+	extendedchars=true,
+	literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'{\i}}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+	{ü}{{\"u}}1 {Ü}{{\"U}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?``}}1 {¡}{{!``}}1
+	{<}{{{\color{delim}<}}}{1}
+	{>}{{{\color{delim}>}}}{1}
+	{?}{{{\color{delim}?}}}{1}
+	{*}{{{\color{delim}*}}}{1}
+	{+}{{{\color{delim}+}}}{1}
+	{/}{{{\color{delim}/}}}{1}
+	{,}{{{\color{punct}{,}}}}{1}
+	{;}{{{\color{punct}{;}}}}{1}
+	{.}{{{\color{punct}{.}}}}{1}
+	{:}{{{\color{punct}{:}}}}{1}
+	{\{}{{{\color{delim}{\{}}}}{1} {\}}{{{\color{delim}{\}}}}}{1},
+	morekeywords={ask,select,from,where,order,by,distinct,limit,offset,optional,union,filter,prefix,bound,desc,regex,str,group,not,exists,minus,service,certain,maybe}
+}
+
+\lstdefinestyle{sparqld}{
+	basicstyle=\scriptsize\ttfamily,
+	identifierstyle=\color{black},
+	keywordstyle=\color{keyw}\bfseries,
+	ndkeywordstyle=\color{greenCode}\bfseries,
+	stringstyle=\color{ocherCode}\ttfamily,
+	commentstyle=\color{darkgray}\ttfamily,
+	language={sparql},
+	tabsize=2,
+	showtabs=false,
+	showspaces=false,
+	showstringspaces=false,
+	extendedchars=true,
+	escapechar=`,
+	frame={single},
+	breaklines=true,
+	basewidth=0.5em,
+	moredelim=[is][\color{magenta}]{~}{~},
+	moredelim=**[is][\color{gray}]{£}{£},
+	moredelim=**[is][\color{blue!50!black}]{$}{$},
+	moredelim=[is][\color{orange!80!black}]{!}{!},
+	moredelim=**[is][\color{green!50!black}]{¬}{¬},
+	xleftmargin=2ex,
+	xrightmargin=1ex,
+	aboveskip=1.5ex,
+	belowskip=1.5ex
+}
+
+\makeatletter
+\newcommand{\sqbox}{%
+	\collectbox{%
+		\@tempdima=\dimexpr\width-\totalheight\relax
+		\ifdim\@tempdima<\z@
+		\fbox{\hbox{\hspace{-.5\@tempdima}\BOXCONTENT\hspace{-.5\@tempdima}}}%
+		\else
+		\ht\collectedbox=\dimexpr\ht\collectedbox+.5\@tempdima\relax
+		\dp\collectedbox=\dimexpr\dp\collectedbox+.5\@tempdima\relax
+		\fbox{\BOXCONTENT}%
+		\fi
+	}%
+}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /SPARQL Listing style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TiKz for RDF graphs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds,matrix,chains,scopes,calc}
+
+\newcommand{\hsp}{\vphantom{Ag}}
+\tikzset{
+	std/.style={ 
+		draw,
+		circle,
+		anchor=center,
+		inner sep=0pt,
+		minimum size=5pt
+	},
+	lab/.style={ 
+		text centered,
+		fill=white, 
+		inner sep=0.7pt,
+		font=\tt\small\hsp},
+	iri/.style={
+		draw=black!50!white, 
+		rectangle,
+		rounded corners,
+		thick,
+		text centered,
+		top color=white, 
+		bottom color=black!15,
+		%opacity=0.7,
+		%text opacity=1,
+		font=\tt\small\hsp,
+		anchor=center},
+	lit/.style={
+		draw=black!50!white, 
+		rectangle,
+		thick,
+		text centered,
+		top color=white, 
+		bottom color=black!15, 
+		anchor=center,
+		%opacity=0.7,
+		%text opacity=1,
+		font=\tt\small\hsp},
+	arrout/.style={
+		->,
+		-latex,
+		%draw=black!50, 
+		%fill=black!50,
+		%thick,
+		font=\tt\small\hsp},
+	arrin/.style={
+		<-,
+		latex-,
+		%draw=black!50, 
+		%fill=black!50,
+		%thick,
+		font=\tt\small\hsp},
+	arrinout/.style={
+		<->,
+		latex-latex,
+		%draw=black!50, 
+		%fill=black!50,
+		%thick,
+		font=\tt\small\hsp},
+	arrstd/.style={
+		-,
+		%draw=black!50, 
+		%fill=black!50,
+		thick},
+	dashmed/.style={
+		-,
+		%draw=black!50, 
+		%fill=black!50,
+		thick,
+		dash pattern=on 3pt off 3pt,
+		font=\tt\small\hsp},
+	fade/.style={
+		opacity=0.4,
+		text opacity=0.4
+	},
+	fadet/.style={
+		opacity=1,
+		text opacity=0.4
+	},
+	every loop/.style={
+		<-,
+		latex-,
+		fill=black!50,
+		min distance=10mm,
+		in=0,
+		out=60,
+		looseness=10,
+		draw=black!50,
+		thick,
+		font=\tt\small\hsp
+	},
+	lean/.style={
+		dotted,
+		blue
+	},
+	leane/.style={
+		dotted,
+		blue
+	},
+	leanl/.style={
+		text=blue
+	}	
+}
+
+\newlength{\hgap}
+\newlength{\vgap}
+\setlength{\hgap}{2cm}
+\setlength{\vgap}{1.2cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /TiKz for RDF graphs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PGFplots
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.statistics}
+
+\makeatletter
+\pgfplotsset{
+	boxplot prepared from table/.code={
+		\def\tikz@plot@handler{\pgfplotsplothandlerboxplotprepared}%
+		\pgfplotsset{
+			/pgfplots/boxplot prepared from table/.cd,
+			#1,
+		}
+	},
+	/pgfplots/boxplot prepared from table/.cd,
+	table/.code={\pgfplotstablecopy{#1}\to\boxplot@datatable},
+	row/.initial=0,
+	make style readable from table/.style={
+		#1/.code={
+			\pgfplotstablegetelem{\pgfkeysvalueof{/pgfplots/boxplot prepared from table/row}}{##1}\of\boxplot@datatable
+			\pgfplotsset{boxplot/#1/.expand once={\pgfplotsretval}}
+		}
+	},
+	make style readable from table=lower whisker,
+	make style readable from table=upper whisker,
+	make style readable from table=lower quartile,
+	make style readable from table=upper quartile,
+	make style readable from table=median,
+}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /PGFplots
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{arydshln}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Hyperref
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\definecolor{dark-blue}{rgb}{0.0,0.0,0.2}
+\definecolor{dark-green}{rgb}{0.0,0.2,0.0}
+\definecolor{dark-red}{rgb}{0.2,0.0,0.0}
+\hypersetup{
+	colorlinks, linkcolor={dark-red},
+	citecolor={dark-green}, urlcolor={dark-blue},
+	pdftitle={Canonicalisation of Monotone SPARQL Queries},    % title
+	pdfauthor={Jaime Salas, Aidan Hogan},     % author
+	pdfsubject={ISWC 2018},   % subject of the document
+	pdfkeywords={sparql;} {canonicalisation;} {containment;} {query;} {equivalence;} {caching;}, % list of keywords
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /Hyperref
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%% MACROS
+
+\newcommand{\B}{\ensuremath{\mathbf{B}}\xspace}
+\newcommand{\I}{\ensuremath{\mathbf{I}}\xspace}
+\renewcommand{\L}{\ensuremath{\mathbf{L}}\xspace}
+\newcommand{\V}{\ensuremath{\mathbf{V}}\xspace}
+
+\newcommand{\cpx}[2]{\ensuremath{\textsc{#1-}\mathrm{#2}}\xspace}
+\newcommand{\npc}{\cpx{NP}{complete}}
+\newcommand{\nph}{\cpx{NP}{hard}}
+\newcommand{\psc}{\cpx{PSpace}{complete}}
+\newcommand{\psh}{\cpx{PSpace}{hard}}
+\newcommand{\gic}{\cpx{GI}{complete}}
+\newcommand{\gih}{\cpx{GI}{hard}}
+\newcommand{\dpc}{\cpx{DP}{complete}}
+\newcommand{\dph}{\cpx{DP}{hard}}
+\newcommand{\conpc}{\cpx{coNP}{complete}}
+\newcommand{\conph}{\cpx{coNP}{hard}}
+\newcommand{\ptp}{\ensuremath{\Pi_2^P}}
+\newcommand{\ptph}{\cpx{\ptp}{hard}}
+\newcommand{\ptpc}{\cpx{\ptp}{complete}}
+
+\newcommand{\tch}[1]{\textbf{#1}}
+\newcommand{\rid}[1]{\textsc{#1}}
+\newcommand{\ttl}[1]{\textsf{#1}}
+\newcommand{\tid}[1]{\textsc{#1}}
+%\newcommand{\dom}{\tid{dom}}
+%\newcommand{\rng}{\tid{rng}}
+%\newcommand{\sC}{\tid{sC}}
+%\newcommand{\sP}{\tid{sP}}
+
+\newcommand{\ssyn}[3]{[\ensuremath{#1\,\textsc{#2}\,#3}]}
+\newcommand{\sand}[2]{\ssyn{#1}{and}{#2}}
+\newcommand{\suni}[2]{\ssyn{#1}{union}{#2}}
+\newcommand{\sopt}[2]{\ssyn{#1}{opt}{#2}}
+\newcommand{\sfil}[2]{\ensuremath{\textsc{filter}_{#2}(#1)}}
+\newcommand{\ssel}[2]{\ensuremath{\textsc{select}_{#2}(#1)}}
+\newcommand{\sseld}[2]{\ensuremath{\textsc{select}^\Delta_{#2}(#1)}}
+\newcommand{\dom}[1]{\ensuremath{\mathrm{dom}(#1)}}
+\newcommand{\can}[1]{\ensuremath{\mathrm{can}(#1)}}
+\newcommand{\com}[2]{\ensuremath{#1 \sim #2}}
+
+%\newcommand{\hsc}[1]{{\footnotesize\MakeUppercase{#1}}}
+\newcommand{\hsc}[1]{#1}
+
+%\newcommand{\utp}[1]{\textsc{tp}{(#1)}}
+\newcommand{\ufo}[1]{\textsf{\hsc{\upshape #1}}}
+\newcommand{\uand}[1]{\ensuremath{\ufo{and}(#1)}}
+\newcommand{\uuni}[1]{\ensuremath{\ufo{union}(#1)}}
+\newcommand{\usel}[2]{\ensuremath{\ufo{select}_{#2}(#1)}}
+\newcommand{\useld}[2]{\ensuremath{\ufo{select}^\Delta_{#2}(#1)}}
+
+\newcommand{\uandn}{\ensuremath{\ufo{and}}}
+\newcommand{\uunin}{\ensuremath{\ufo{union}}}
+
+\newcommand{\bn}[1]{\texttt{\_:#1}}
+\newcommand{\iri}[1]{\texttt{:#1}}
+\newcommand{\var}[1]{\texttt{?#1}}
+
+\newcommand{\ican}[1]{\ensuremath{\textsc{iCan}(#1)}}
+\newcommand{\ecan}[1]{\ensuremath{\textsc{eCan}(#1)}}
+
+\newcommand{\ev}[2]{\ensuremath{#1(#2)}}
+
+\def\ojoin{\setbox0=\hbox{$\bowtie$}%
+	\rule[0.18ex]{.25em}{.5pt}\llap{\rule[.9ex]{.25em}{.5pt}}}
+\def\loj{\mathbin{\ojoin\mkern-5.8mu\bowtie}}
+
+\newcommand{\da}{\ensuremath{:\nolinebreak\mkern-1.2mu\nolinebreak=}}
+
+\newcommand{\qedr}{\begin{flushright}\qed\end{flushright}}
+
+\newcommand{\yt}{\ding{51}}%
+\newcommand{\nt}{\ding{55}}%
+
+\newcommand{\para}[1]{\smallskip\noindent\textbf{#1:}}
+
+\newcommand{\mq}{\textsc{mq}\xspace}
+\newcommand{\mqs}{\textsc{mq}s\xspace}
+\newcommand{\ucq}{\textsc{ucq}\xspace}
+\newcommand{\ucqs}{\textsc{ucq}s\xspace}
+\newcommand{\cq}{\textsc{cq}\xspace}
+\newcommand{\cqs}{\textsc{cq}s\xspace}
+\newcommand{\cuq}{\textsc{ucq}\xspace}
+\newcommand{\cuqs}{\textsc{ucq}s\xspace}
+
+%%%%%%%%
+
+\graphicspath{ {images/} }	
+
 \begin{document}
-\title{\Huge{Versioned Datasets and Queries in RDF/SPARQL}}
-\author{Ignacio Cuevas\\ Aidan Hogan}
-\date{\today}
+\title{Versioned Queries in SPARQL}
+\author{Ignacio Cuevas \and Aidan Hogan}
+
+\institute{IMFD Chile \& Department of Computer Science, University of Chile}
+
 \maketitle
-\newpage
-%\abstract{} % Do we need one?
+
+\begin{abstract}
+Although many prominent Linked Datasets are in a state of constant evolution, historical data are rarely published in a standard way: while dumps are sometimes provided of old versions of the dataset, there is no widely agreed-upon way for clients to quickly see historical changes for the description of a given resource,  or the results of a given SPARQL query, etc. In this paper, we focus on the problem of indexing historical versions of an RDF graph in a SPARQL engine and rewriting queries according to two versioning primitives: viewing results from a particular version, or viewing changes between two consecutive versions. Aiming to maintain compatibility with off-the-shelf SPARQL engines, we identify and compare several models by which historical versions of an RDF graph can be stored as named graphs, and discuss how base queries can be rewritten in each model per the two aforementioned primitives. We then present a performance comparison of these models with respect to X weekly versions of Wikidata and Y user-defined queries with versioning, using Virtuoso and Jena as reference SPARQL implementations. Our results show ...
+\end{abstract}
+
+
 \section{Introduction}
 The Semantic Web~\footnote{\url{https://www.w3.org/2001/sw/wiki/Main_Page}} is an initiative of the World Wide Web Consortium, which envisions a ``Web of Data;'' that is, a web of \textit{Linked Data} where information has an standarized structure, making it easier for systems and machines to comunicate. In order to make such standarization possible, it becomes necessary to incorporate meta-data that describes the content, meaning and relationship of data in all databases.
 
