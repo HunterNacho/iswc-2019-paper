@@ -437,7 +437,16 @@ Such system could be used as version control for the dataset; administrators wou
 Gutierrez et al.~\cite{GutierrezHV07} describe a framework that allows time representation in RDF using annotations. An important distinction to make is that their work is focused on \textbf{labeling} over \textbf{versioning}; \textbf{labeling} means adding meta-data to query result validity, meanwhile \textbf{versioning} implies simultaneously keeping several versions of the same dataset. This work also formally defines labels and time intervals, but does not cover an implementation for either.
 
 
-Zimmerman et. al~\cite{DBLP:journals/ws/ZimmermannLPS12} extend RDF to allow generalized annotations which can, in particular, be used to add validity time intervals to each triple.
+Zimmerman et al.~\cite{DBLP:journals/ws/ZimmermannLPS12} extend RDF, allowing the use of generalized annotations, which can be used to represent time intervals and associated to each triple to represent their validity. Same as the previously mentioned work, the objectives seeked by Zimmerman et al. do not completely align with the present work, due to the fact that an RDF extension is used. It will, however, be considered to compare results.
+
+
+Grandi~\cite{Grandi10} proposes an extension for SPARQL, including a time component in queries. No implementation details are provided, however. The methodology used for building timed queries will be compared to the one this work defines.
+
+
+The prior three works share their focus on formal definitions over implementations. They also do not consider eficiency or scalability analysis and employ SPARQL extensions and/or specialized indices. In light of these facts, said works will be considered only to compare results for the most part.
+
+
+Lastly, Tappolet and Bernstein~\cite{TappoletB09} add a time component to RDF's syntax, proposing an eficient method to make SPARQL queries on it, as well. The dataset is annotated with time intervals corresponding to each triple's validity, and a specialized index compliments the query engine. Since this is an alternative solution to the explored challenge, it will be used to compare results, while also evaluating whether their specialized index is necessary and if similar results can be achieved using standar SPARQL.
 \section{Preliminaries} % Maybe not
 \section{(Method)} % Name of our method goes here
 \section{Evaluation} % This two sections can
