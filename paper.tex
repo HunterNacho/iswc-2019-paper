@@ -402,7 +402,7 @@
 \graphicspath{ {images/} }	
 
 \begin{document}
-\title{Versioned Queries in SPARQL}
+\title{Versioned Queries in Native SPARQL Stores}
 \author{Ignacio Cuevas \and Aidan Hogan}
 
 \institute{IMFD Chile \& Department of Computer Science, University of Chile}
@@ -410,7 +410,7 @@
 \maketitle
 
 \begin{abstract}
-Although many prominent Linked Datasets are in a state of constant evolution, historical data are rarely published in a standard way: while dumps are sometimes provided of old versions of the dataset, there is no widely agreed-upon way for clients to quickly see historical changes for the description of a given resource,  or the results of a given SPARQL query, etc. In this paper, we focus on the problem of indexing historical versions of an RDF graph in a SPARQL engine and rewriting queries according to two versioning primitives: viewing results from a particular version, or viewing changes between two consecutive versions. Aiming to maintain compatibility with off-the-shelf SPARQL engines, we identify and compare several models by which historical versions of an RDF graph can be stored as named graphs, and discuss how base queries can be rewritten in each model per the two aforementioned primitives. We then present a performance comparison of these models with respect to X weekly versions of Wikidata and Y user-defined queries with versioning, using Virtuoso and Jena as reference SPARQL implementations. Our results show ...
+Although many prominent Linked Datasets are in a state of constant evolution, historical data are rarely published in a standard way. Though a number of works have recently addressed the issue of querying and managing archives of versioned RDF data, most propose dedicated solutions, which incurs a certain deployment cost. We rather propose solutions for representing archives of versioned RDF data using the standard SPARQL language, allowing existing implementations to be used. For querying, we consider two versioning primitives: viewing results from a particular version, or viewing changes between two consecutive versions. We identify and compare several models by which historical versions of an RDF graph can be stored as named graphs, and discuss how base queries can be rewritten in each model per the two aforementioned primitives. We then present a performance comparison of these models and baseline (non-)versioned queries with respect to 23 weekly versions of Wikidata and 232 user-defined queries, using Virtuoso as a reference SPARQL implementation.
 \end{abstract}
 
 
