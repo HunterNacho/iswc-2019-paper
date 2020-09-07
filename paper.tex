@@ -300,7 +300,7 @@
 \hypersetup{
 	colorlinks, linkcolor={dark-red},
 	citecolor={dark-green}, urlcolor={dark-blue},
-	pdftitle={Versioned Queries over RDF Archives using Native SPARQL Storage},    % title
+	pdftitle={Versioned Queries over RDF Archives: All You Need is SPARQL?},    % title
 	pdfauthor={Ignacio Cuevas, Aidan Hogan},     % author
 	pdfsubject={MEPDaW 2020: Managing the Evolution and Preservation of the Data Web},   % subject of the document
 	pdfkeywords={sparql;} {versioning;} {rdf archives;} {dynamics}, % list of keywords
@@ -402,7 +402,7 @@
 \graphicspath{ {images/} }	
 
 \begin{document}
-\title{Versioned Queries over RDF Archives using Native SPARQL Storage}
+\title{Versioned Queries over RDF Archives:\\All You Need is SPARQL?}
 
 \author{Ignacio Cuevas \and Aidan Hogan}
 \institute{Department of Computer Science, University of Chile \& IMFD Chile}
@@ -410,45 +410,67 @@
 \maketitle
 
 \begin{abstract}
-Although many prominent Linked Datasets are in a state of constant evolution, historical data are rarely published in a standard way. Though a number of works have recently addressed the issue of querying and managing archives of versioned RDF data, most propose dedicated solutions, which incurs a high deployment cost. We rather propose solutions for representing archives of versioned RDF data using the standard SPARQL language, allowing existing implementations to be used. For querying, we consider two versioning primitives: viewing results from a particular version, or viewing changes between two consecutive versions. We identify and compare several models by which historical versions of an RDF graph can be stored as named graphs, and discuss how base queries can be rewritten in each model per the two aforementioned primitives. We then present a performance comparison of these models and baseline (non-)versioned queries with respect to 23 weekly versions of Wikidata and 232 user-defined queries, using Virtuoso as a reference SPARQL implementation.
+Although many prominent Linked Datasets are in a state of constant evolution, historical data are rarely published in a standard way. Though a number of works have recently addressed the issue of querying and managing archives of versioned RDF data, most propose dedicated solutions, which incurs a high deployment cost. We rather explore solutions for representing archives of versioned RDF data using the SPARQL standard without modification, allowing existing implementations to be used. For querying, we consider two versioning primitives: viewing results from a particular version, or viewing results that change between two consecutive versions. We identify and compare several models by which historical versions of an RDF graph can be stored as named graphs, and discuss how base queries can be rewritten in each model per the two aforementioned primitives. We then present a performance comparison of these models and baseline (non-)versioned queries with respect to 23 weekly versions of Wikidata and 232 user-defined queries, using Virtuoso as a reference SPARQL implementation.
 \end{abstract}
 
 
 \section{Introduction}
 
-A key aspect of the Web is its dynamic nature, where documents are frequently updated, deleted and added. Likewise when we speak of the Semantic Web, it is important to consider that sources may be dynamic and RDF datasets are subject to change. The traditional Web and the Semantic Web thus share similar strengths and limitations regarding the dynamics of information. In terms of strengths, the flexible nature of both webs means that documents can be updated with little restriction and with little need for centralised coordination. On the other hand, in terms of limitations, neither web has built in support for preservation, nor for versioning; for example, on the traditional Web, the HTTP protocol does not permit requesting a past version of a webpage. For this reason, a number of specialised ``Web archives'' have emerged that attempt to capture and track different intermittent versions of documents on the Web, the most prominent of which is the Internet Archive~\cite{JaffeK09}. While similar techniques can be applied to Semantic Web documents containing RDF data -- simply archiving and thus preserving the syntax of the document itself -- the structured nature of such content means that an RDF archive can potentially do a lot more.
+A key aspect of the Web is its dynamic nature, where documents are frequently updated, deleted and added. Likewise when we speak of the Semantic Web, it is important to consider that sources may be dynamic and RDF datasets are subject to change~\cite{KaferAUOH13}. It is in this context that various works have looked at versioning in the context of RDF/SPARQL~\cite{VolkelG06,TappoletB09,Grandi10,GraubeHU14,KhuranaD16}, with recent works proposing \textit{RDF archives}~\cite{FernandezPU15,Cerdeira-PenaFF16,BahriLA18,FernandezUPK19,TaelmanSHMV19} that manage RDF graphs and their historical changes, allowing for querying across different versions of the graph. Within these works, a variety of specialised indexing techniques~\cite{Cerdeira-PenaFF16,BahriLA18,TaelmanSHMV19}, query languages~\cite{TappoletB09} and benchmarks~\cite{KotsevMPEFK16,FernandezUPK19} have been proposed, developed and evaluated. While these represent important advances, many such proposals are by their nature incompatible with the existing SPARQL infrastructure. Furthermore, benchmarks have mostly focused on synthetic data. Hence there is still a considerable gap between these research works and putting RDF archives into practice.
 
-A number of works have looked at archiving RDF content from the Web. One such example is the Dynamic Linked Data Observatory (DyLDO)~\cite{KaferAUOH13}, which has been tracking and archiving changes in a sample of around 100,000 RDF documents each week since 2013. Other works rather focus on aspects relating to detecting change~\cite{TummarelloMBE07,ZeginisTC11,PapavasileiouFFKC13,KaferAUOH13,DividinoKG14,RoussakisCSFS15,NishiokaS18}, notifying of changes~\cite{TummarelloMBE07,PopitschH11,PassantM10,TrampFEA10}, versioning data~\cite{VolkelG06,GraubeHU14,KhuranaD16}, and so forth. 
+%The traditional Web and the Semantic Web thus share similar strengths and limitations regarding the dynamics of information. In terms of strengths, the flexible nature of both webs means that documents can be updated with little restriction and with little need for centralised coordination. On the other hand, in terms of limitations, neither web has built in support for preservation, nor for versioning; for example, on the traditional Web, the HTTP protocol does not permit requesting a past version of a webpage. For this reason, a number of specialised ``Web archives'' have emerged that attempt to capture and track different intermittent versions of documents on the Web, the most prominent of which is the Internet Archive~\cite{JaffeK09}. While similar techniques can be applied to Semantic Web documents containing RDF data -- simply archiving and thus preserving the syntax of the document itself -- the structured nature of such content means that an RDF archive can potentially do a lot more.
 
-% RDF archives~\cite{FernandezUPK19}
+%A number of works have looked at tracking the dynamics of RDF data on the Web. One such example is the Dynamic Linked Data Observatory (DyLDO)~\cite{KaferAUOH13}, which has been tracking and archiving weekly changes in a diverse sample of RDF documents since 2013. 
 
+In order to bridge this gap, we highlight that -- in theory at least -- there is no need for specialised indexes, query languages, etc., but rather that the types of versioned queries proposed in the literature~\cite{FernandezPU15} can be supported using off-the-shelf SPARQL engines that already enjoy years of development, optimisation, etc., as well as broad deployment on the Web. For example, SPARQL named graphs can be used to track different versions of individual graphs. However, as Fernandez at al.~\cite{FernandezUPK19} note, the approach of using pure SPARQL would ``\textit{typically render rather inefficient SPARQL queries}''. This claim raises the research question: how inefficient will pure SPARQL be in this setting? Though Fernandez at al.~\cite{FernandezUPK19} do discuss how pure SPARQL could be used, to the best of our knowledge, this question has not been empirically explored. If a pure SPARQL solution could be found with relatively little overhead versus base queries (over a single current version) then the benefits would be significant in terms of being able to leverage existing SPARQL infrastructure -- i.e., languages, protocols, implementations -- for managing and querying RDF archives.
 
+In this paper, we present preliminary empirical results addressing this research question. Specifically we take the Virtuoso SPARQL engine~\cite{Erling12} and  evaluate five different representations of RDF archives for XX different weekly versions of truthy Wikidata dumps~\cite{VrandecicK14}. We then implement query rewriting mechanisms for each representation in order to support single-version queries and sequential single-delta queries that retrieve all solutions over an indicated version and all solutions that differ between two sequential versions, respectively. We then perform experiments to compare the sizes of indexes, the costs of indexing new versions, and the costs of query evaluation for base queries over the current version versus rewritten versioned queries.
 
-Currently, a large number of existing datasets are based on RDF due to its extense popularity, Wikidata being one the most notorious. Wikidata~\cite{VrandecicK14} is a massive dataset, with over 42 million items~\footnote{\url{https://www.wikidata.org/wiki/Wikidata:Statistics}}, which is based on all the available data of Wikipedia and structured on RDF.
-
-
-Wikidata is in constant change, due to it being an open dataset that allows being edited by users. Furthermore, data is being added often, which makes Wikidata very dynamic in some areas. Given those circumstances, it can be said that Wikidata has many ``versions'' over time, where different data is available at different time intervals, making it possible to analyze its time component.
-
-
-Dataset versioning in RDF/SPARQL is a research topic yet to be fully explored. While there are a number of implementations, most of them rely on specialized indices or SPARQL extensions. As such, it would be relevant to study the possibility of developing a versioning system and methodology for queries using only base SPARQL.
+%Other works rather focus on aspects relating to detecting change~\cite{TummarelloMBE07,ZeginisTC11,PapavasileiouFFKC13,KaferAUOH13,DividinoKG14,RoussakisCSFS15,NishiokaS18}, notifying changes~\cite{TummarelloMBE07,PopitschH11,PassantM10,TrampFEA10}, versioning data~\cite{VolkelG06,GraubeHU14,KhuranaD16}, and so forth. A more recent development is that of RDF archives~\cite{FernandezPU15,Cerdeira-PenaFF16,FernandezUPK19}
 
 
-Such system could be used as version control for the dataset; administrators would be able to detect erroneous or malicious editions on data that doesn't normally change. On top of that, it would be possible to analyze the evolution of data, possibly predicting future changes. The system could also be used on datasets other than Wikidata, where data history may be poorly (or not at all) preserved.
+
+%Currently, a large number of existing datasets are based on RDF due to its extense popularity, Wikidata being one the most notorious. Wikidata~\cite{VrandecicK14} is a massive dataset, with over 42 million items~\footnote{\url{https://www.wikidata.org/wiki/Wikidata:Statistics}}, which is based on all the available data of Wikipedia and structured on RDF.
+%
+%
+%Wikidata is in constant change, due to it being an open dataset that allows being edited by users. Furthermore, data is being added often, which makes Wikidata very dynamic in some areas. Given those circumstances, it can be said that Wikidata has many ``versions'' over time, where different data is available at different time intervals, making it possible to analyze its time component.
+%
+%
+%Dataset versioning in RDF/SPARQL is a research topic yet to be fully explored. While there are a number of implementations, most of them rely on specialized indices or SPARQL extensions. As such, it would be relevant to study the possibility of developing a versioning system and methodology for queries using only base SPARQL.
+%
+%
+%Such system could be used as version control for the dataset; administrators would be able to detect erroneous or malicious editions on data that doesn't normally change. On top of that, it would be possible to analyze the evolution of data, possibly predicting future changes. The system could also be used on datasets other than Wikidata, where data history may be poorly (or not at all) preserved.
 
 \section{Related Work}
-Gutierrez et al.~\cite{GutierrezHV07} describe a framework that allows time representation in RDF using annotations. An important distinction to make is that their work is focused on \textbf{labeling} over \textbf{versioning}; \textbf{labeling} means adding meta-data to query result validity, meanwhile \textbf{versioning} implies simultaneously keeping several versions of the same dataset. This work also formally defines labels and time intervals, but does not cover an implementation for either.
+
+Various temporal extensions for RDF/SPARQL have been proposed in literature. Gutierrez et al.~\cite{GutierrezHV07} describe a framework that allows time representation in RDF using annotations. Pugliese et al.~\cite{PuglieseUS08} more generally explore time annotations in RDF, proposing semantics, queries and specialised indexes. Zimmerman et al.~\cite{ZimmermannLPS12} provide a general framework for annotating RDF that generalises temporal annotations; they further propose a query language called AnQL for querying annotated RDF. Proposed temporal extensions for SPARQL include $\tau$-SPARQL~\cite{TappoletB09}, T-SPARQL~\cite{Grandi10}, SPARQL-ST~\cite{PerryJS11}, SPARQL\textsuperscript{T}~\cite{ZanioloGACG18}, etc. Related to temporality, a number of systems propose versioning supported for RDF, including SemVersion~\cite{VolkelG06}, x-RDF-3x~\cite{NeumannW10}, R43ples~\cite{GraubeHU14}, Dydra~\cite{AndersonB16} and Ostrich~\cite{TaelmanSV18}. 
+
+More recently the concept of RDF archives have been gaining more and more attention. Fernandez et al.~\cite{FernandezPU15} provide a general survey and introduction to the theme, discussing the types of queries that one might wish to answer in the context of an RDF archive. Works by Cerdeira{-}Pena et al.~\cite{Cerdeira-PenaFF16}, Zaniolo et al.~\cite{ZanioloGACG18} and Taelman et al.~\cite{TaelmanSHMV19} propose ways to compress and index RDF archives, while Khurana and Deshpande~\cite{KhuranaD16} propose indexes more generally for historical graph data. Bahri et al.~\cite{BahriLA18} explore the benefits of using Apache Spark to manage RDF archives in a distributed setting. In order to evaluate these emerging techniques, a number of benchmarks have been proposed, including the BEnchmark of RDF
+ARchives (BEAR)~\cite{FernandezUPK19}, and the Semantic Publishing Benchmark (SPB)~\cite{Papakonstantinou18}.
+
+In summary, the past years have seen a wide range of developments in terms of representations, languages, vocabularies, indexes, algorithms, etc., for managing and querying over temporal and/or versioned RDF data. However, to the best of our knowledge, most of these approaches propose specialised languages, implementations, etc., for these purposes. Such languages have the benefit of allowing to more concisely and intuitively express versioned queries, while such implementations can develop optimised techniques that leverage particular characteristics of versioned data. The downside of these specialised approaches is that they are often diverge from practice, requiring the use of research prototypes rather than established SPARQL implementations, non-standard languages, etc. A number of authors have acknowledged that one can manage and query RDF archives using vanilla SPARQL, though it may lead to prolix or inefficient queries~\cite{TappoletB09,FernandezUPK19}; however, we are not aware of any empirical results along these lines. Our work presents some preliminary results that aim to fill this gap and to better understand the costs and limitations of using vanilla SPARQL to host RDF archives.
 
 
-Zimmerman et al.~\cite{DBLP:journals/ws/ZimmermannLPS12} extend RDF, allowing the use of generalized annotations, which can be used to represent time intervals and associated to each triple to represent their validity. Same as the previously mentioned work, the objectives seeked by Zimmerman et al. do not completely align with the present work, due to the fact that an RDF extension is used. It will, however, be considered to compare results.
+%An important distinction to make is that their work is focused on \textbf{labeling} over \textbf{versioning}; \textbf{labeling} means adding meta-data to query result validity, meanwhile \textbf{versioning} implies simultaneously keeping several versions of the same dataset. This work also formally defines labels and time intervals, but does not cover an implementation for either.
 
 
-Grandi~\cite{Grandi10} proposes an extension for SPARQL, including a time component in queries. No implementation details are provided, however. The methodology used for building timed queries will be compared to the one this work defines.
+%Zimmerman et al.~\cite{DBLP:journals/ws/ZimmermannLPS12} extend RDF, allowing the use of generalized annotations, which can be used to represent time intervals and associated to each triple to represent their validity. Same as the previously mentioned work, the objectives seeked by Zimmerman et al. do not completely align with the present work, due to the fact that an RDF extension is used. It will, however, be considered to compare results.
 
 
-The prior three works share their focus on formal definitions over implementations. They also do not consider efficiency or scalability analysis and employ SPARQL extensions and/or specialized indices. In light of these facts, said works will be considered only to compare results for the most part.
+%Grandi~\cite{Grandi10} proposes an extension for SPARQL, including a time component in queries. No implementation details are provided, however. The methodology used for building timed queries will be compared to the one this work defines.
 
 
-Lastly, Tappolet and Bernstein~\cite{TappoletB09} add a time component to RDF's syntax, proposing an eficient method to make SPARQL queries on it, as well. The dataset is annotated with time intervals corresponding to each triple's validity, and a specialized index compliments the query engine. Since this is an alternative solution to the explored challenge, it will be used to compare results, while also evaluating whether their specialized index is necessary and if similar results can be achieved using standar SPARQL.
+%The prior three works share their focus on formal definitions over implementations. They also do not consider efficiency or scalability analysis and employ SPARQL extensions and/or specialized indices. In light of these facts, said works will be considered only to compare results for the most part.
+
+
+%Lastly, Tappolet and Bernstein~\cite{TappoletB09} add a time component to RDF's syntax, proposing an eficient method to make SPARQL queries on it, as well. The dataset is annotated with time intervals corresponding to each triple's validity, and a specialized index compliments the query engine. Since this is an alternative solution to the explored challenge, it will be used to compare results, while also evaluating whether their specialized index is necessary and if similar results can be achieved using standar SPARQL.
+
+% \cite{ArndtNRMM19} GIT for RDF
+
+% \cite{Papakonstantinou18} Benchmark results
+
+% \cite{PelgrinGH20}
+
 \section{Preliminaries} % Maybe not
 \section{(Method)} % Name of our method goes here
 \section{Evaluation} % This two sections can
