@@ -519,7 +519,7 @@ Our general approach is to represent an RDF archive as a SPARQL dataset $D$ but 
 \end{align*}%
 }%
 %
-As can be seen for the definitions of $G_i$, these transformations are lossless: we can retrieve any version of the graph from any such transformation. The first two transformations start with the earliest version as a base. The first encodes deltas always with respect to the first version. The second encodes deltas with respect to the previous version. The latter two transformations start with the latest version. The third encodes deltas with respect to the latest version. The second encodes deltas with respect to the subsequent version. Letting $\mathcal{H} = (H_1,\ldots,H_n)$ such that $H_i = G_{n-i+1}$ ($1 \leq i \leq n$), i.e., such that $\mathcal{H}$ ``reverses''$\mathcal{G}$, we remark that $\mathcal{G}^n_1 = \mathcal{H}^1_n$ and $\mathcal{G}^n_{n-1} = \mathcal{H}^{n-1}_n$. Each such transformation can then be represented as a SPARQL dataset with $2(n-1)+1$ named graphs.
+As can be seen for the definitions of $G_i$, these transformations are lossless: we can retrieve any version of the graph from any such transformation. The first two transformations start with the earliest version as a base. The first encodes deltas always with respect to the first version. The second encodes deltas with respect to the previous version. The latter two transformations start with the latest version. The third encodes deltas with respect to the latest version. The forth encodes deltas with respect to the subsequent version. Letting $\mathcal{H} = (H_1,\ldots,H_n)$ such that $H_i = G_{n-i+1}$ ($1 \leq i \leq n$), i.e., such that $\mathcal{H}$ ``reverses''$\mathcal{G}$, we remark that $\mathcal{G}^n_1 = \mathcal{H}^1_n$ and $\mathcal{G}^n_{n-1} = \mathcal{H}^{n-1}_n$. Each such transformation can then be represented as a SPARQL dataset with $2(n-1)+1$ named graphs.
 
 In terms of space we expect $\mathcal{G}^n_{n-1}$ and $\mathcal{G}^{n-1}_n$ to be the most efficient as they always encode deltas from a neighbouring version. However, in terms of query rewriting, we expect $\mathcal{G}^n_{1}$ and $\mathcal{G}^{1}_n$ to be more efficient as they do not require a recursive construction of all intermediate versions towards the base version. In terms of indexing a new version, we expect $\mathcal{G}^{n}_1$ followed by $\mathcal{G}^{n}_{n-1}$ to be most efficient as they require only computing the most recent deltas; we expect $\mathcal{G}^{1}_n$, followed by $\mathcal{G}^{n-1}_{n}$, to be much more expensive, requiring a recompute of all deltas. On the other hand, $\mathcal{G}^{1}_n$ and $\mathcal{G}^{n-1}_{n}$ should be advantageous for queries over more recent versions, which we could reasonably expect to be the most frequent.\footnote{One may note that these four representations are analogous to differential backups, incremental backups, reverse-differential backups, and reverse-incremental backups.}
 
@@ -529,7 +529,12 @@ In general, we expect the space to be similar to $\mathcal{G}^n_{n-1}$ and $\mat
 
 %There are a fours ways in which this can be done. The first option is to transform the RDF archive $\mathcal{G} = (G_1,\ldots,G_n)$ into a set of deltas relative to the initial version: $\mathcal{G}^1_n = (G_1,\Delta_1^2,\Delta_2^1,\ldots,\Delta_1^n,\Delta_n^1)$, resulting in $2(n-1)+1$ graphs. A particular version $G_i$ can then be reconstructed by applying $(G_1 \cup \Delta_i^1) \setminus \Delta_1^i$.
 
+
 \section{Versioned Queries}
+
+\begin{verbatim}
+?s :p ?o
+\end{verbatim}
 
 \section{Experiments} 
 
