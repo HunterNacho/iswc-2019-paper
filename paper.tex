@@ -10,6 +10,7 @@
 \usepackage{comment}
 \usepackage{framed}
 \usepackage{listings}
+\usepackage{mathtools}
 %\usepackage{pifont}% http://ctan.org/pkg/pifont
 %\usepackage{balance}
 %\usepackage{stmaryrd}
@@ -346,10 +347,13 @@
 \newcommand{\sand}[2]{\ssyn{#1}{and}{#2}}
 \newcommand{\suni}[2]{\ssyn{#1}{union}{#2}}
 \newcommand{\sopt}[2]{\ssyn{#1}{opt}{#2}}
+\newcommand{\sminus}[2]{\ssyn{#1}{minus}{#2}}
 \newcommand{\sfil}[2]{\ensuremath{\textsc{filter}_{#2}(#1)}}
-\newcommand{\ssel}[2]{\ensuremath{\textsc{select}_{#2}(#1)}}
-\newcommand{\sseld}[2]{\ensuremath{\textsc{select}^\Delta_{#2}(#1)}}
+\newcommand{\ssel}[2]{\ensuremath{\textsc{select}_{#2}#1}}
+\newcommand{\sseld}[2]{\ensuremath{\textsc{select}^\Delta_{#2}#1}}
+\newcommand{\sfrom}[3]{\ensuremath{\textsc{from}_{#2,#3}#1}}
 \newcommand{\dom}[1]{\ensuremath{\mathrm{dom}(#1)}}
+\newcommand{\vars}[1]{\ensuremath{\mathrm{vars}(#1)}}
 \newcommand{\can}[1]{\ensuremath{\mathrm{can}(#1)}}
 \newcommand{\com}[2]{\ensuremath{#1 \sim #2}}
 
@@ -471,10 +475,41 @@ In summary, the past years have seen a wide range of developments in terms of re
 
 % \cite{PelgrinGH20}
 
-\section{Preliminaries} % Maybe not
-\section{(Method)} % Name of our method goes here
-\section{Evaluation} % This two sections can
-\section{Results}    % be merged for better flow
+\section{Preliminaries}
+
+We first establish some preliminaries and notation. RDF triples are composed of three sets of terms: IRIs (\I), literals (\L) and blank nodes (\B). In this preliminary work, we do not consider blank nodes, whose special semantics complicates the detection of changes in RDF graphs~\cite{ZeginisTC11}. Leaving aside blank nodes, an RDF triple $(s,p,o) \in \I \times \I \times (\I \cup \L)$ consists of a subject $s$, predicate $p$ and object $o$. An RDF graph $G$ is then a set of triples. An RDF archive is a tuple of RDF graphs $\mathcal{G} = (G_1,\ldots,G_n)$, interpreted as $n$ sequential versions of a given RDF graph. We denote by $\Delta_{i}^j \coloneqq G_i \setminus G_j$ the triples in version $i$ not in version $j$, and by $\mathcal{G}(s,p,o) \coloneqq \{ i \mid (s,p,o) \in G_i\text{ for } 1 \leq i \leq n \}$ the versions containing $(s,p,o)$.\footnote{The definition $\mathcal{G} : \I \times \I \times (\I \cup \L) \rightarrow 2^{\{1,\ldots,n\}}$~\cite{FernandezUPK19} is analogous to $\mathcal{G} = (G_1,\ldots,G_n)$.}
+
+A triple pattern $(s,p,o) \in (\I \cup \V) \times (\I \cup \V) \times (\I \cup \L \cup \V)$ is an RDF triple that permits variables from a set $\V$ to appear in any position. A solution is a partial mapping $\mu : \V \rightarrow \I \cup \L$. We denote by $\dom{\mu}$ the \textit{domain} of $\mu$, i.e., the set of variables for which $\mu$ is defined. We say that two solutions $\mu_1, \mu_2$ are compatible, denoted $\mu_1 \sim \mu_2$, if and only if $\mu_1(v) = \mu_2(v)$ for all $v \in \dom{\mu_1} \cap \dom{\mu_2}$.
+
+A basic graph pattern $B$ is a set of triple patterns. Let $\vars{B}$ denote the set of variables appearing in $B$ and let $\mu(B)$ denote the image of $B$ under $\mu$, i.e., the result of replacing all variables $v \in \dom{\mu} \cap \vars{B}$ with $\mu(v)$ in $B$. The evaluation of a basic graph pattern $B$ on an RDF graph $G$ is given as $B(G) \coloneqq \{ \mu \mid \mu(B) \subseteq G\text{ and }\dom{\mu} = \vars{B} \}$.
+
+SPARQL queries are based on basic graph patterns and a number of relational operators. Similar to Pérez et al.~\cite{PerezAG09}, we define an abstract syntax for a subset of SPARQL of pertinence to this paper as follows. A basic graph pattern $B$ is a graph pattern. Furthermore, if $P$ and $Q$ are graph patterns, and $V \subset \V$ is a set of variables, then $\sand{P}{Q}$, $\suni{P}{Q}$, $\sminus{P}{Q}$ and $\ssel{P}{V}$ are graph patterns. We define the semantics of these graph patterns in Table~\ref{tab:sparql}.
+
+\begin{table}[t]
+{\scriptsize
+\begin{align*}
+\sand{P}{Q}(G) \da &\, P(G) \Join Q(G) & M_1 \Join M_2 \da &\, \{ \mu_1 \cup \mu_2 \mid \mu_1 \in M_1,\, \mu_2 \in M_2,\, \com{\mu_1}{\mu_2} \} \\
+\suni{P}{Q}(G) \da &\, P(G) \cup Q(G) & M_1 \cup M_2 \da &\, \{ \mu \mid \mu \in M_1\text{ or }\mu \in M_2 \} \\
+\sminus{P}{Q}(G) \da &\, P(G) \setminus Q(G) &  M_1 \setminus M_2 \da &\, \{ \mu_1 \in M_1 \mid \nexists \mu_2 \in M_2 : \com{\mu_1}{\mu_2} \} \\
+%M_1 \loj M_2 \da\, & (M_1 \bowtie M_2) \cup (M_1 \setminus M_2) \\
+%\sigma_R(M) \da\,& \{ \mu \in M \mid \mu \models R \}\\
+\ssel{P}{V}(G) \da &\, \pi_V(P(G)) & \pi_V(M) \da\,& \{ \mu' \mid \exists \mu \in M : \mu' \sim \mu, \dom{\mu'} = V \cap \dom{\mu} \}
+\end{align*}}
+\caption{Semantics for SPARQL query operators where $M$, $M_1$ and $M_2$ denote sets of solutions, $V$ denotes a set of variables\label{tab:sparql}}
+\end{table}
+
+In this paper, we rely not only on RDF graphs, but also on SPARQL datasets to represent RDF archives. A SPARQL dataset $D \coloneqq \{ G, (n_1,G_1), \ldots (n_m,G_m) \}$ consists of a default (RDF) graph $G$ and a set of named graphs, each being a pair $(n_i,G_i)$ where $n_i \in \I$, $G_i$ is an RDF graph, and $n_i \neq n_j$ for $1 \leq i \leq m$, $1 \leq j \leq m$, $i \neq j$. For simplicity, we will consider a SPARQL dataset $D$ to be a set of quads of the form $(G \times \{*\}) \cup (G_1 \times \{n_1\}) \cup \ldots \cup (G_m \times \{n_m\})$, where $* \notin \I \cup \L \cup \V$ is a special symbol denoting the default graph.\footnote{We thus assume a \textit{quad store}, and disallow empty named graphs.} Different named graphs can be queried using a \texttt{GRAPH} operator, creating quad patterns. A quad pattern $(s,p,o,g) \in (\I \cup \V) \times (\I \cup \V) \times (\I \cup \L \cup \V) \times (\I \cup \{ *\})$ extends a triple pattern with a fourth element that may be an IRI or *. A basic named graph pattern $C$ is then a set of quad patterns whose evaluation on an SPARQL dataset $D$ is given as $C(D) \coloneqq \{ \mu \mid \mu(C) \subseteq D\text{ and }\dom{\mu} = \vars{C} \}$. Following the SPARQL standard~\cite{sparql11}, we translate a triple pattern $(s,p,o)$ to a quad pattern $(s,p,o,*)$ such that it is evaluated only on the default graph.\footnote{In concrete SPARQL syntax, quad patterns are expressed with the $\texttt{GRAPH}$ keyword.} The semantics of the operators defined in Table~\ref{tab:sparql} then remain unchanged simply allowing $P$ and $Q$ to now represent basic named graph patterns, defined to be graph patterns.
+
+SPARQL provides two operators to initialise a SPARQL dataset: \texttt{FROM} and \texttt{FROM NAMED}. We combine both for brevity into one operator. A graph pattern $P$ is considered to be a query. Likewise if $P$ is a graph pattern, and $M$ and $N$ are sets of IRIs, then $\sfrom{P}{M}{N}$ is also a query. The evaluation of $\sfrom{P}{M}{N}$ on a dataset $D$ is defined as $\sfrom{P}{M}{N}(D) \coloneqq P(D_{M,N})$, where the query dataset $D_{M,N} \coloneqq (\cup_{m \in M} D(m) \times \{ *\}) \cup  (\cup_{n \in N} D(n) \times n)$ is formed from a default graph containing the union\footnote{Since we do not allow blank nodes, a union or RDF merge is equivalent.} of graphs with a name $m \in M$, and all the named graphs in $D$ with a graph named $n \in N$. We will be able to use these operators to define query datasets that capture specific versions in an RDF archive.
+
+\section{Versioned Data}
+
+Our general approach is to represent an RDF archive as a SPARQL dataset $D$.
+
+\section{Versioned Queries}
+
+\section{Experiments} 
+
 \section{Conclusion}
 \newpage
 \bibliographystyle{unsrt}
