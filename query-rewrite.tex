@@ -1,0 +1,153 @@
+Base pattern:
+\begin{verbatim}
+?s :p ?o
+\end{verbatim}
+
+\section{Single Version queries}
+\subsection{Baseline}
+The relevant version is select using a $\mathtt{FROM}$ or $\mathtt{GRAPH}$ statement.
+\begin{verbatim}
+FROM :i
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+\end{verbatim}
+Alternatively:
+\begin{verbatim}
+GRAPH :i {?s :p ?o}
+\end{verbatim}
+
+
+\subsection{Intervals}
+$\forall j \leq i, k \geq i$
+\begin{verbatim}
+FROM :j-k
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+\end{verbatim}
+Alternatively $\mathtt{UNION}$ all :j-k where j $\leq$ i $\leq$ k in patterns such as:
+\begin{verbatim}
+GRAPH :j-k {?s :p ?o}
+\end{verbatim}
+\subsection{Absolute deltas}
+The base version and ``positive'' deltas are combined as the default graph and the negative deltas are subtracted from the results.
+\subsubsection{First version as base}
+\begin{verbatim}
+FROM :1
+FROM :2-1
+FROM NAMED :1-2
+FROM :3-1
+FROM NAMED :1-3
+\end{verbatim}
+\vdots
+\begin{verbatim}
+FROM :i-1
+FROM NAMED 1-i
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+MINUS { GRAPH :1-2 {?s :p ?o} }
+MINUS { GRAPH :1-3 {?s :p ?o} }
+\end{verbatim}
+\vdots
+\begin{verbatim}
+MINUS { GRAPH :1-i {?s :p ?o} }
+\end{verbatim}
+
+\subsubsection{Last version as base}
+\begin{verbatim}
+FROM :n
+FROM :(n-1)-n
+FROM NAMED :n-(n-1)
+FROM :(n-2)-n
+FROM NAMED :n-(n-2)
+\end{verbatim}
+\vdots
+\begin{verbatim}
+FROM :i-n
+FROM NAMED n-i
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+MINUS { GRAPH :n-(n-1) {?s :p ?o} }
+MINUS { GRAPH :n-(n-2) {?s :p ?o} }
+\end{verbatim}
+\vdots
+\begin{verbatim}
+MINUS { GRAPH :n-i {?s :p ?o} }
+\end{verbatim}
+
+\subsection{Sequential deltas}
+The triple is searched in all deltas from the base up to the target. If the most recent delta is ``positive'', the match is preserved, otherwise it is discarded.
+\subsubsection{First version as base}
+\begin{verbatim}
+{ SELECT  ?s ?o (MIN(?v0_) AS ?max_v0)
+  WHERE
+    { { { GRAPH ?g0
+            { ?s  :p  ?o }
+          ?g0  :direction  "forwards" .
+          ?g0  :version  ?v0
+        }
+        BIND(str(?v0) AS ?v0_)
+      }
+      FILTER ( str(?v0) <= i )
+    }
+  GROUP BY ?s ?o
+}
+OPTIONAL
+{ { SELECT  ?s ?o (MAX(?v1_) AS ?max_v1)
+  WHERE
+    { { { GRAPH ?g1
+            { ?s  :p  ?o }
+          ?g1  :direction  "backwards" .
+          ?g1  :version  ?v1
+        }
+        BIND(str(?v1) AS ?v1_)
+      }
+      FILTER ( str(?v1) <= i )
+    }
+  GROUP BY ?s ?o
+}
+FILTER ( ( ! bound(?max_v1) ) || ( str(?max_v0) > str(?max_v1) ) )
+}
+\end{verbatim}
+\subsubsection{Last version as base}
+\begin{verbatim}
+{ SELECT  ?s ?o (MIN(?v0_) AS ?max_v0)
+  WHERE
+    { { { GRAPH ?g0
+            { ?s  <http://ex.org/p>  ?o }
+          ?g0  :direction  "backwards" .
+          ?g0  :version  ?v0
+        }
+        BIND(str(?v0) AS ?v0_)
+      }
+      FILTER ( str(?v0) >= i )
+    }
+  GROUP BY ?s ?o
+}
+OPTIONAL
+{ { SELECT  ?s ?o (MIN(?v1_) AS ?max_v1)
+  WHERE
+    { { { GRAPH ?g1
+            { ?s  :p  ?o }
+          ?g1  :direction  "forwards" .
+          ?g1  :version  ?v1
+        }
+        BIND(str(?v1) AS ?v1_)
+      }
+      FILTER ( str(?v1) >= i )
+    }
+  GROUP BY ?s ?o
+}
+FILTER ( ( ! bound(?max_v1) ) || ( str(?max_v0) < str(?max_v1) ) )
+}
+\end{verbatim}
+
+
+\section{Version Delta queries}
