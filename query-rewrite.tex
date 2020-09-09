@@ -20,7 +20,10 @@ GRAPH :i {?s :p ?o}
 
 
 \subsection{Intervals}
-$\forall j \leq i, k \geq i$
+All intervals containing the target version are combined as the default graph and the triple pattern is kept unmodified. 
+
+
+$\forall$ j $\leq$ i, k $\geq$ i
 \begin{verbatim}
 FROM :j-k
 \end{verbatim}
@@ -33,52 +36,28 @@ Alternatively $\mathtt{UNION}$ all :j-k where j $\leq$ i $\leq$ k in patterns su
 GRAPH :j-k {?s :p ?o}
 \end{verbatim}
 \subsection{Absolute deltas}
-The base version and ``positive'' deltas are combined as the default graph and the negative deltas are subtracted from the results.
+The base version and ``positive'' delta are combined as the default graph and the ``negative'' delta is subtracted from the results.
 \subsubsection{First version as base}
 \begin{verbatim}
 FROM :1
-FROM :2-1
-FROM NAMED :1-2
-FROM :3-1
-FROM NAMED :1-3
-\end{verbatim}
-\vdots
-\begin{verbatim}
 FROM :i-1
-FROM NAMED 1-i
+FROM NAMED :1-i
 \end{verbatim}
 \vdots
 \begin{verbatim}
 ?s :p ?o
-MINUS { GRAPH :1-2 {?s :p ?o} }
-MINUS { GRAPH :1-3 {?s :p ?o} }
-\end{verbatim}
-\vdots
-\begin{verbatim}
 MINUS { GRAPH :1-i {?s :p ?o} }
 \end{verbatim}
 
 \subsubsection{Last version as base}
 \begin{verbatim}
 FROM :n
-FROM :(n-1)-n
-FROM NAMED :n-(n-1)
-FROM :(n-2)-n
-FROM NAMED :n-(n-2)
-\end{verbatim}
-\vdots
-\begin{verbatim}
 FROM :i-n
-FROM NAMED n-i
+FROM NAMED :n-i
 \end{verbatim}
 \vdots
 \begin{verbatim}
 ?s :p ?o
-MINUS { GRAPH :n-(n-1) {?s :p ?o} }
-MINUS { GRAPH :n-(n-2) {?s :p ?o} }
-\end{verbatim}
-\vdots
-\begin{verbatim}
 MINUS { GRAPH :n-i {?s :p ?o} }
 \end{verbatim}
 
@@ -121,7 +100,7 @@ FILTER ( ( ! bound(?max_v1) ) || ( str(?max_v0) > str(?max_v1) ) )
 { SELECT  ?s ?o (MIN(?v0_) AS ?max_v0)
   WHERE
     { { { GRAPH ?g0
-            { ?s  <http://ex.org/p>  ?o }
+            { ?s  :p  ?o }
           ?g0  :direction  "backwards" .
           ?g0  :version  ?v0
         }
@@ -151,3 +130,91 @@ FILTER ( ( ! bound(?max_v1) ) || ( str(?max_v0) < str(?max_v1) ) )
 
 
 \section{Version Delta queries}
+\subsection{Baseline}
+The target version is select using a $\mathtt{FROM}$ or $\mathtt{GRAPH}$ statement, while the preceding version can only be accessed using a $\mathtt{GRAPH}$ statement.
+\begin{verbatim}
+FROM :i
+FROM NAMED :(i-1)
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+MINUS { GRAPH :(i-1) {?s :p ?o} }
+\end{verbatim}
+Alternatively:
+\begin{verbatim}
+GRAPH :i {?s :p ?o}
+MINUS { GRAPH :(i-1) {?s :p ?o} }
+\end{verbatim}
+
+
+\subsection{Intervals}
+All intervals containing the target version are combined as the default graph and the triple pattern is kept unmodified. All intervals containing the preceding version are accessed as named graphs and subtracted from the results.
+
+
+$\forall$ j $\leq$ i, k $\geq$ i; $\forall$ l $\leq$ (i-1), m $\geq$ (i-1)
+\begin{verbatim}
+FROM :j-k
+FROM NAMED :l-m
+\end{verbatim}
+\vdots
+\begin{verbatim}
+?s :p ?o
+MINUS { GRAPH :l-m {?s :p ?o} }
+\end{verbatim}
+Alternatively $\mathtt{UNION}$ all :j-k where j $\leq$ i $\leq$ k in patterns such as:
+\begin{verbatim}
+GRAPH :j-k {?s :p ?o}
+\end{verbatim}
+and then subtract the same patterns as above.
+\subsection{Absolute deltas}
+The base version and ``positive'' deltas are combined as the default graph and the negative deltas are subtracted from the results to build the target version. For the preceding version, the base and ``positive'' delta are combined with an $\mathtt{UNION}$ statement and the ``negative'' delta is substracted with a $\mathtt{MINUS}$ statement.
+\subsubsection{First version as base}
+\begin{verbatim}
+FROM :1
+FROM :i-1
+FROM NAMED :1-i
+FROM NAMED :1
+FROM NAMED :(i-1)-1
+FROM NAMED :1-(i-1)
+\end{verbatim}
+\vdots
+\begin{verbatim}
+{
+?s :p ?o
+MINUS { GRAPH :1-i {?s :p ?o} }
+}
+MINUS {
+{	{ GRAPH :1 {?s :p ?o} }
+	UNION
+	{ GRAPH :(i-1)-1 {?s :p ?o} }
+} MINUS { GRAPH :1-(i-1) {?s :p ?o} }
+}
+\end{verbatim}
+
+\subsubsection{Last version as base}
+\begin{verbatim}
+FROM :n
+FROM :i-n
+FROM NAMED :n-i
+FROM NAMED :n
+FROM NAMED :(i-1)-n
+FROM NAMED :n-(i-1)
+\end{verbatim}
+\vdots
+\begin{verbatim}
+{
+?s :p ?o
+MINUS { GRAPH :n-i {?s :p ?o} }
+}
+MINUS {
+{	{ GRAPH :n {?s :p ?o} }
+	UNION
+	{ GRAPH :(i-1)-n {?s :p ?o} }
+} MINUS { GRAPH :n-(i-1) {?s :p ?o} }
+}
+\end{verbatim}
+
+\subsection{Sequential deltas}
+For sequential deltas, Version Delta queries are handled as two separate queries. Each of these is rewritten as a Single Version query.
+\end{verbatim}
