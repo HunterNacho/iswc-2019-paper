@@ -1,0 +1,66 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{sansmath}
+\usepackage{xspace}
+
+\newcommand{\ic}{\ensuremath{\textsc{i}\vphantom{_d^{+}}\xspace}}
+\newcommand{\cbpd}{\ensuremath{\textsc{c}_d^{+}}\xspace}
+\newcommand{\cbpi}{\ensuremath{\textsc{c}_i^{+}}\xspace}
+\newcommand{\cbmd}{\ensuremath{\textsc{c}_d^{-}}\xspace}
+\newcommand{\cbmi}{\ensuremath{\textsc{c}_i^{-}}\xspace}
+\newcommand{\cbi}{\ensuremath{\textsc{c}_i}\xspace}
+\newcommand{\cbd}{\ensuremath{\textsc{c}_d}\xspace}
+\newcommand{\cbp}{\ensuremath{\textsc{c}^{+}}\xspace}
+\newcommand{\cbm}{\ensuremath{\textsc{c}^{-}}\xspace}
+\newcommand{\tb}{\ensuremath{\textsc{t}\vphantom{_d^{+}}\xspace}}  
+
+
+\begin{document}
+	
+	\pgfplotstableread[col sep=tab]{indextime.tsv}\mydata
+	
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	ymax=2500,
+	ymin=0,
+	ytick={0,500,...,2500},
+%	xmax=75,
+	enlarge x limits=0.15,
+	xlabel={Representation},
+	ylabel={Time (min.)},
+	xticklabels={\ic,\cbpd,\cbpi,\cbmd,\cbmi,\tb},
+	typeset ticklabels with strut,
+	xtick style={draw=none},
+	ytick style={draw=none},
+	ylabel style={font=\footnotesize,yshift=-0.5em},
+	xlabel style={font=\footnotesize,yshift=0.1em},
+	yticklabel style={font=\scriptsize},
+	xticklabel style={font=\scriptsize,yshift=0.3em},
+	%ytick pos=left,
+	bar width=2ex,
+	width=5.3cm,
+	height=4cm,
+	ymajorgrids=true,
+	%yticklabels from table={\mydata}{val},
+	xtick={1,...,6},
+	nodes near coords,
+	every node near coord/.append style={font=\tiny}
+%	legend style={at={(0.5,1.02)},anchor=south},
+%	legend columns=2,
+%	reverse legend
+	]
+	
+	\addplot[green!30!black,fill=green!40!white]  table [x=rep, y=size]
+	{\mydata};
+	
+%	\addplot table [x=WD, y=num]
+%	{\mydata};
+%	
+%	\legend{\textsc{re},\textsc{wqh}}
+	\end{axis}
+	
+	\end{tikzpicture}
+	
+\end{document}

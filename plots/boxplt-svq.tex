@@ -1,0 +1,289 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{sansmath}
+\usepackage{xspace}
+
+\usepgfplotslibrary{statistics}
+\pgfplotsset{compat=1.8}
+
+\makeatletter
+\pgfplotsset{
+  % example copied from the manual
+  boxplot/draw/average/.code={%
+    \color{.!80!black}          % <-- added
+    \draw[/pgfplots/boxplot/every average/.try]
+    \pgfextra
+    \pgftransformshift{%
+         \pgfplotsboxplotpointabbox{\pgfplotsboxplotvalue{average}}{0.5}%
+    }%
+    \pgfuseplotmark{\tikz@plot@mark}%
+    \endpgfextra;
+  },
+}
+\makeatother
+
+\pgfplotsset{grid style={dashed,gray}}    
+
+% borrowed from <https://tex.stackexchange.com/a/145967/95441>
+\pgfmathdeclarefunction{fpumod}{2}{%
+    \pgfmathfloatdivide{#1}{#2}%
+    \pgfmathfloatint{\pgfmathresult}%
+    \pgfmathfloatmultiply{\pgfmathresult}{#2}%
+    \pgfmathfloatsubtract{#1}{\pgfmathresult}%
+     % replaced `0' by `5' to make it work for this problem
+    \pgfmathfloatifapproxequalrel{\pgfmathresult}{#2}{\def\pgfmathresult{5}}{}%
+}
+
+\pgfplotscreateplotcyclelist{mylist}{%
+    {brown!80!black,fill=brown!10!white},
+    {red!80!black,fill=red!10!white},
+    {blue!80!black,fill=blue!10!white},
+    {orange!70!black,fill=orange!10!white},
+    {green!60!black,fill=green!10!white},
+    {magenta!60!black,fill=magenta!10!white}
+}
+    
+\pgfplotsset{grid style={dashed,gray}}
+
+\newcommand{\ic}{\ensuremath{\textsc{i}\vphantom{_d^{+}}\xspace}}
+\newcommand{\cbpd}{\ensuremath{\textsc{c}_d^{+}}\xspace}
+\newcommand{\cbpi}{\ensuremath{\textsc{c}_i^{+}}\xspace}
+\newcommand{\cbmd}{\ensuremath{\textsc{c}_d^{-}}\xspace}
+\newcommand{\cbmi}{\ensuremath{\textsc{c}_i^{-}}\xspace}
+\newcommand{\cbi}{\ensuremath{\textsc{c}_i}\xspace}
+\newcommand{\cbd}{\ensuremath{\textsc{c}_d}\xspace}
+\newcommand{\cbp}{\ensuremath{\textsc{c}^{+}}\xspace}
+\newcommand{\cbm}{\ensuremath{\textsc{c}^{-}}\xspace}
+\newcommand{\tb}{\ensuremath{\textsc{t}\vphantom{_d^{+}}\xspace}}  
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+boxplot/draw direction=y,
+ylabel={Time (ms)},
+height=5.7cm,
+cycle list name=mylist,
+boxplot={
+    %
+    % Idea: 
+    %  place the 
+    %  group 1 at 0.2 and 0.4 and 0.6 and 0.8
+    %  group 2 at 1.2 and 1.4 and 1.6 and 1.8
+    %  group 3 at ...
+    %  ...
+    % in a formula:
+    draw position={1/7 + floor(\plotnumofactualtype/6) + 1/7*fpumod(\plotnumofactualtype,6)},
+    %
+    % box width :
+    box extend=0.1,
+},
+%
+legend entries={\ic,\cbpd,\cbpi,\cbmd,\cbmi,\tb},
+legend columns = 6,             
+legend style={at={(0.5,1.02)},anchor=south},
+% ... it also means that 1 unit in x controls the width:
+x=4cm,
+% ... and it means that we should describe intervals:
+xtick={0,1,2,3},
+xmin=0,
+xmax=3,
+ymode=log,
+log basis y={10},
+ymin=1,
+ymax=300000,
+x tick label as interval,
+ymajorgrids,
+xmajorgrids,
+x grid style = {
+    solid,
+    black,
+    line width = 0.5pt
+},
+y grid style = {
+    dotted,
+    black
+},
+xticklabels={%
+    V1,V5,V8
+},
+x tick label style={
+   text width=2.5cm,
+   align=center
+},
+]
+
+\addlegendimage{brown!80!black,fill=brown!10!white,only marks, mark=square*}
+\addlegendimage{red!80!black,fill=red!10!white,only marks, mark=square*}
+\addlegendimage{blue!80!black,fill=blue!10!white,only marks, mark=square*}
+\addlegendimage{orange!60!black,fill=orange!10!white,only marks, mark=square*}
+\addlegendimage{green!60!black,fill=green!10!white,only marks, mark=square*}
+\addlegendimage{magenta!60!black,fill=magenta!10!white,only marks, mark=square*}
+
+%% V1
+% I
+\addplot+ [
+boxplot prepared={
+lower whisker=1, lower quartile=17,
+median=137,average=8909,
+upper quartile=1509, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPD
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=66,
+median=230,average=7663,
+upper quartile=2385, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPI
+\addplot+ [
+boxplot prepared={
+lower whisker=20, lower quartile=140,
+median=820,average=42871,
+upper quartile=10878, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMD
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=57,
+median=269,average=9824,
+upper quartile=2925, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMI
+\addplot+ [
+boxplot prepared={
+lower whisker=16, lower quartile=160,
+median=992,average=43483,
+upper quartile=10285, upper whisker=300000,
+},
+]  coordinates {};
+
+% T
+\addplot+ [
+boxplot prepared={
+lower whisker=4, lower quartile=63,
+median=237,average=10430,
+upper quartile=3675, upper whisker=300000,
+},
+]  coordinates {};
+
+%% V5
+% I
+\addplot+ [
+boxplot prepared={
+lower whisker=1, lower quartile=16,
+median=142,average=9667,
+upper quartile=1617, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPD
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=25,
+median=162,average=9150,
+upper quartile=1716, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPI
+\addplot+ [
+boxplot prepared={
+lower whisker=15, lower quartile=102,
+median=576,average=43650,
+upper quartile=11370, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMD
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=21,
+median=153,average=8814,
+upper quartile=1878, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMI
+\addplot+ [
+boxplot prepared={
+lower whisker=15, lower quartile=96,
+median=572,average=43164,
+upper quartile=10574, upper whisker=300000,
+},
+]  coordinates {};
+
+%T
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=21,
+median=155,average=12467,
+upper quartile=3628, upper whisker=300000,
+},
+]  coordinates {};
+
+%% V8
+% I
+\addplot+ [
+boxplot prepared={
+lower whisker=1, lower quartile=17,
+median=141,average=10092,
+upper quartile=1626, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPD
+\addplot+ [
+boxplot prepared={
+lower whisker=2, lower quartile=19,
+median=140,average=9698,
+upper quartile=1642, upper whisker=300000,
+},
+]  coordinates {};
+
+% CPI
+\addplot+ [
+boxplot prepared={
+lower whisker=15, lower quartile=103,
+median=600,average=43788,
+upper quartile=11314, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMD
+\addplot+ [
+boxplot prepared={
+lower whisker=1, lower quartile=15,
+median=97,average=7562,
+upper quartile=1300, upper whisker=300000,
+},
+]  coordinates {};
+
+% CMI
+\addplot+ [
+boxplot prepared={
+lower whisker=14, lower quartile=44,
+median=124,average=25480,
+upper quartile=500, upper whisker=300000,
+},
+]  coordinates {};
+
+%T
+\addplot+ [
+boxplot prepared={
+lower whisker=1, lower quartile=18,
+median=138,average=10706,
+upper quartile=2750, upper whisker=300000,
+},
+]  coordinates {};
+\end{axis}
+\end{tikzpicture}
+\end{document}
