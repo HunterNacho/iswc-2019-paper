@@ -22,6 +22,8 @@
 \usepackage{inconsolata}
 \usepackage{etoolbox}
 
+\renewcommand{\UrlFont}{\ttfamily\scriptsize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Quickly switch from conference to extended version
 \providetoggle{conf}
@@ -506,6 +508,17 @@ SPARQL provides two operators to initialise a SPARQL dataset: \texttt{FROM} and 
 
 Our general approach is to represent an RDF archive as a SPARQL dataset $D$ but there are multiple representations by which this can be achieved, each with its own strength and weaknesses. We propose six different representations falling into three different categories as discussed by various authors (e.g.,~\cite{TzitzikasTA08,FernandezPU15}): \textit{Independent Copies} (\textit{IC}), \textit{Change-Based} (\textit{CB}) and \textit{Timestamp-Based} (\textit{TB}).
 
+\newcommand{\ic}{\textsc{i}\xspace}
+\newcommand{\cbpd}{\ensuremath{\textsc{c}_d^{+}}\xspace}
+\newcommand{\cbpi}{\ensuremath{\textsc{c}_i^{+}}\xspace}
+\newcommand{\cbmd}{\ensuremath{\textsc{c}_d^{-}}\xspace}
+\newcommand{\cbmi}{\ensuremath{\textsc{c}_i^{-}}\xspace}
+\newcommand{\cbi}{\ensuremath{\textsc{c}_i}\xspace}
+\newcommand{\cbd}{\ensuremath{\textsc{c}_d}\xspace}
+\newcommand{\cbp}{\ensuremath{\textsc{c}^{+}}\xspace}
+\newcommand{\cbm}{\ensuremath{\textsc{c}^{-}}\xspace}
+\newcommand{\tb}{\textsc{t}\xspace}
+
 \paragraph{Independent Copies (IC):} Perhaps the most intuitive representation is to store each constituent graph of an RDF Archive $\mathcal{G} = (G_1,\ldots,G_n)$ as a SPARQL dataset $D = \{ (x_1,G_1), \ldots, (x_n,G_n)\}$, where $x_1,\ldots,x_n$ are IRIs that deterministically identify the version. This will result in relatively simple (and thus likely efficient) rewritten queries, but can be expected to occupy a lot of space, particularly in cases where a small proportion of triples change from version to version. We thus consider the $IC$ representation to be a baseline for comparison.
 
 \paragraph{Change-Based (CB):} The core idea of $CB$ representations is to store only triples that change from a given reference version. Along these lines, in the following we denote by $\Delta_{i}^j \coloneqq G_i \setminus G_j$ the triples in version $i$ not in version $j$. We then consider four $CB$ representations based on the following transformations of an RDF archive $\mathcal{G} = (G_1,\ldots,G_n)$:
@@ -537,6 +550,35 @@ In general, we expect the space to be similar to $\mathcal{G}^n_{n-1}$ and $\mat
 \end{verbatim}
 
 \section{Experiments} 
+
+We now perform experiments to address the following research questions (Q1) Which of the six representations allow for better compression, more efficient indexing, and more efficient updates of a new version? (Q2) How do the query runtimes of compressed representations (\textit{CB}, \textit{TB}) compare with indexing complete versions (\textit{IC})? (Q3) Which representation works best overall? 
+
+\paragraph{Setting} We address these research questions in the context of a Wikidata archive of 8 weekly truthy versions from 2017-08-09 with 1.506 billion triples, to 2017-09-27 with 1.924 billion triples. The RDF archive thus consists of 13.477 billion versioned triples. Each week 25--93 million triples are added, while 4--6 million triples are removed (an update counts as both an addition and a removal). We base our experiments on the example list of queries contributed by users and members of the Wikidata community, which features a wide variety of query operators, diverse terms, etc.\footnote{\url{https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples}} We translate some of the Wikidata-specific features (e.g., the label service) to standard SPARQL. We further filter queries that feature federation to other endpoints, property paths, and qualifiers (not present in the truthy versions). The result is a test set of 146 SPARQL queries. We choose Virtuoso as our SPARQL implementation since it is widely used and has demonstrated good performance in prior benchmarks over Wikidata~\cite{HernandezHK15}. The runtimes presented are averaged over three runs. A timeout of 5 minutes was set per query.
+
+\paragraph{Indexing} We first look at the results of total index sizes for each representation. In Figure~\ref{fig:index} we show the index sizes (GB) for each representation, the time taken (min.) to bulk load all versions in the representation, and the time taken (min.) to update the archive indexing seven versions with the eighth version. We see that (as expected) \ic has the largest index sizes, followed by \cbpd and \cbmd. followed by \tb, followed by \cbpi and \cbmi with the smallest indexes. We see that for a bulk load, index times correlate with index size, with \ic being by far the slowest due to the greater volume of data to index. Finally, with respect to the version update, we again see a similar trend, except that (as expected) \cbmi is far slower than the other alternatives (even \ic) as the entire archive must be built from scratch relative to the most recent version, taking time comparable to a full bulk load.
+
+\paragraph{Single version queries} We apply the rewriting of our 146 SPARQL queries for each of our six representations in order to retrieve results for version 1, 5 and 8. We show the results as box-plots with log $y$-axis in Figure~\ref{fig:svq}. In general we note that median times were generally in the range of 100-1000~ms, though 1--20 queries timed-out in each experiment, affecting the mean (shown as a diamond). In terms of mean and median runtimes, \ic performs the best, with \cbpd, \cbmd and \tb also performing competitively across the different versions. Conversely, \cbpi and \cbmi perform quite poorly relative to the other options (except \cbmi in the case of version 8, which performs well in the median case). Contrasting the query times with index sizes, we note a clear time--space trade-off, where the largest index performs best, the smallest perform worst, and those with intermediate space perform in the middle of the pack. 
+
+\paragraph{Delta version queries} Next we rewrite our 146 SPARQL queries in order to retrieve delta results between versions 1--2, 4--5 and 7--8 from each of our six representations. We again show the results as box-plots with log $y$-axis in Figure~\ref{fig:dvq}. When compared with single version queries, we see a considerable leap in time, where the median runtimes of even the best performing representations approach or exceed 1000 ms more frequently. This time we note that the best performance is offered by \tb, followed by \ic, \cbpi and \cbmi. Conversely,  \cbpd and \cbmd perform very poorly. In these experiments the incremental builds perform better than differential builds as the incremental deltas directly provide the difference between subsequent versions, providing an additional avenue for optimisation.  
+
+
+\begin{figure}[t]
+\includegraphics[scale=0.8]{plots/indexsize}
+\includegraphics[scale=0.8]{plots/indextime}
+\includegraphics[scale=0.8]{plots/updatetime}
+\caption{Indexing details including size (left), bulk load (mid) and version update (right) \label{fig:index}}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[scale=0.8]{plots/boxplt-svq}
+\caption{Single version query times for version 1 (left), 5 (mid) and 8 (right) \label{fig:svq}}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[scale=0.8]{plots/boxplt-dvq}
+\caption{Delta version query times for version 1--2 (left), 4--5 (mid) and 7--8 (right) \label{fig:dvq}}
+\end{figure}
+
 
 \section{Conclusion}
 \newpage
