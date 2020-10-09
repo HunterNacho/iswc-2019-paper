@@ -1,5 +1,5 @@
 \RequirePackage{amsmath}
-\documentclass{llncs}
+\documentclass[a4paper]{llncs}
 \usepackage[utf8]{inputenc}
 \PassOptionsToPackage{table}{xcolor}
 \pagestyle{headings}  % This option shows page numbers, it have to be removed in the final document.
@@ -21,6 +21,14 @@
 \usepackage{url}
 \usepackage{inconsolata}
 \usepackage{etoolbox}
+
+\newcommand\copyrighttext{%
+  \footnotesize Copyright © 2020 for this paper by its authors. Use permitted under Creative Commons License Attribution 4.0 International (CC BY 4.0).}
+\newcommand\copyrightnotice{%
+\begin{tikzpicture}[remember picture,overlay]
+\node[anchor=south,yshift=70pt,xshift=\marginparsep] at (current page.south) {{\parbox{\dimexpr\textwidth-\fboxsep-\fboxrule\relax}{\copyrighttext}}};
+\end{tikzpicture}%
+}
 
 \renewcommand{\UrlFont}{\ttfamily\scriptsize}
 
@@ -414,6 +422,7 @@
 \institute{Department of Computer Science, University of Chile \& IMFD Chile}
 
 \maketitle
+\copyrightnotice
 
 \begin{abstract}
 We explore solutions for representing archives of versioned RDF data using the SPARQL standard and off-the-shelf engines. We consider six representations of RDF archives based on named graphs, and describe how input queries can be automatically rewritten to return solutions for a particular version, or solutions that change between versions. We evaluate these alternatives over an archive of 8 weekly versions of Wikidata and 146 queries using Virtuoso as the SPARQL engine.
